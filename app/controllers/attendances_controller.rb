@@ -33,6 +33,10 @@ class AttendancesController < ApplicationController
     ActiveRecord::Base.transaction do # トランザクションを開始します。
       attendances_params.each do |id, item|
         attendance = Attendance.find(id)
+         if (item[:started_at].blank? && item[:finished_at].present?) || (item[:started_at].present? && item[:finished_at].blank?)
+           flash[:danger] = "出勤時間及び退勤時間が必要です。"
+           redirect_to attendances_edit_one_month_user_url(date: params[:date]) and return
+         end
         attendance.update_attributes!(item)
       end
     end
